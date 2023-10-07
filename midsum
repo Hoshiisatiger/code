@@ -1,0 +1,207 @@
+#include <iostream>
+#include <cstring>
+#include <ctype.h>
+#include <cstring>
+#include <iostream>
+using namespace std;
+template<typename DataType, int strl>
+class midsum
+{
+public:
+    midsum();
+    ~midsum();
+    void push(DataType x);
+    DataType pop();
+    DataType gettop();
+    int empty();
+
+private:
+    string codition;
+    int top;
+    DataType str[strl];
+
+};
+
+template <typename DataType, int strl>
+midsum<DataType, strl>::midsum(){
+    top=-1;
+}
+
+template <typename DataType, int strl>
+void midsum<DataType, strl>::push(DataType x)
+{
+    if (top==strl-1) throw "上溢";
+    str[++top]=x;
+}
+
+template <typename DataType, int strl>
+DataType midsum<DataType, strl>::pop()
+{
+    if (top==-1) throw "下溢";
+    DataType x;
+    x=str[top--];
+    return x;
+}
+
+template <typename DataType, int strl>
+DataType midsum<DataType, strl>::gettop()
+{
+    if (top==-1) throw "下溢";
+    DataType x;
+    x=str[top];
+    return x;
+}
+
+template <typename DataType, int strl>
+int  midsum<DataType, strl>::empty()
+{
+    if (top==-1)
+        return 1;
+    else
+        return 0;
+}
+
+template <typename DataType>
+string change(string str){
+    string changed="";
+    int opchange=1;
+    midsum s;
+    int i=0;
+    for (i;i<int(str.length();i++)){
+        if (str[i]>='0' && str[i]<='9'){
+            changed+=str[i];
+            opflag=0;}
+        else if (str[i]=='(')
+            s.push(s[i]);
+        else if (str[i]==')'){
+            while (s.gettop!='('){
+                changed+=' ';
+                changed+=s.gettop();
+                s.pop();//40
+                if (s.empty()) break;
+            }
+            s.pop();
+        }
+        else{
+            if(opflag){
+                changed+=str[i];
+                opflag=0;
+            }
+            else{
+                changed+=' ';
+                if(s.empty()) s.push();
+                else if (value(str[i])>value(s.gettop()))  s.push(str[i]);
+                else{
+                    while (value(str[i])<=value(s.gettop())){
+                        changed+=s.gettop();
+                        changed+=' ';
+                        s.pop();
+                        if (s.empty()) break;
+
+                    }
+                    s.push(str[i]);
+
+                }
+                opflag=1;
+
+            }
+        }
+    }
+    while (!s.empty()){
+        changed+=' ';
+        changed+=s.gettop();
+        s.pop();
+
+    }
+
+}
+double calute(double x,double y,char c){
+    switch (c){
+        case('+'):
+        return x+y;
+        break;
+        case ('-'):
+        return x-y;
+        break;
+        case ('*'):
+        return x*y;
+        break;
+        case ('/'):{
+            if (!y){
+                cout<<"0不能做除数"<<endl;
+                exit(0);
+            }
+            return x/y;
+            break;
+        }
+        default:
+        exit(0);
+    }
+}
+int value (char c)
+{
+    switch (c){
+        case ('('):
+        return 0;
+        break;
+        case ('+'):
+        case ('-'):
+        return 1;
+        break;
+        case ('*'):
+        case ('/'):
+        return 2;
+        break;
+    default:
+        cout<<"error"<<endl;   
+    }
+          
+}
+template <typename DataType>
+double result(string str){
+    midsum s_sum;
+    int flag=0;
+    int num=0;
+    int flagfu=0;
+    for (int i=0;i<int(str.length();i++)){
+        if (str[i]>='0'&&str[i]<='9'){
+            num=num*10+str[i]-'0';
+            flag=1;
+        }
+        else{
+            if (flag){
+                if (flagfu)
+                    s_sum.push(-double(num));
+                else{
+                    s_sum.push(double(num));
+                }
+                flag=0;
+                flagfu=0;
+                num=0;
+            }
+            if(str[i]==' '){
+                flagfu=0;
+                continue;
+            }
+            if (str[i]=='-'&&str[i+1]>='0'&&str[i+1]<='9'){
+                flagfu=1;
+                continue;
+            }
+            double a,b;
+            a=s_sum.gettop();
+            s_sum.pop();
+            b=s_sum.gettop();
+            s_sum.pop();
+            s_sum.push(calute(a,b,str[i]));
+        }
+    }
+    return s_sum.gettop();
+}
+template <typename DataType>
+int main()
+{
+    string a;
+    cin>>a;
+    cout<<"Sum is"<<result(change(a))<<endl;
+    return 0;
+}
